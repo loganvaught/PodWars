@@ -34,5 +34,5 @@ This project has served as a tool for me to experiment with:
 
 # Notes:
 - Roblox provides a 3d workspace with humanoid/character logic. There are built in services to facilitate physics, graphics, saving data, object property manipulation, etc.
-- Code readability and organization of this repository are being worked on. This version represents a working prototype. It is a solo project originally designed for me to best understand.
+- Code readability, organization, and application of conventions are being worked on. This was a solo project I designed around what I found appealing.
 - PodWars was originally made for personal growth, entertainment, and for friends. It is not intended for commercial use.
