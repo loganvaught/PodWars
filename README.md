@@ -24,7 +24,7 @@ This project has served as a tool for me to experiment with:
 - After-death spectating
 
 ## Folder Structure:
-- Lobby: The main experience players first join through. Facilitates teleportation to the battlefield.
+- Lobby: The initial game players join. Facilitates teleportation to the battlefield.
 - Battlefield: The main location where players play a round of PodWars.
 - Client: Scripts ran by the client
 - ClientModules: ModuleScripts ran by the client
