@@ -2,13 +2,6 @@
 My current project on the Roblox platform.
 
 PodWars is a competitive multiplayer survival experience that relies on defensive tactics. 
-This project has served as a tool for me to experiment with:
-- Debugging
-- System design
-- Modularity
-- Organization
-- Server-client communication and security
-- Knowledge of time and space complexity
 
 ## Main Current Features:
 - Object oriented inventory and crafting with server enforcement
@@ -32,7 +25,15 @@ This project has served as a tool for me to experiment with:
 - ServerModules: ModuleScripts ran by the server
 - SharedModules: ModuleScripts shared between the server and client.
 
-# Notes:
+## Personal Skills Improved:
+- Debugging
+- System design
+- Modularity
+- Organization
+- Server-client communication and security
+- Knowledge of time and space complexity
+
+## Notes:
 - Roblox provides a 3d workspace with humanoid/character logic. There are built in services to facilitate physics, graphics, saving data, object property manipulation, etc.
 - Code readability, organization, and application of conventions are being worked on. This was a solo project I designed around what I found appealing.
 - PodWars was originally made for personal growth, entertainment, and for friends. It is not intended for commercial use.
