@@ -1,7 +1,7 @@
-# PodWars
+# Pod Wars
 My current project on the Roblox platform.
 
-PodWars is a competitive multiplayer survival experience that relies on defensive tactics. 
+Pod Wars is a competitive multiplayer survival experience that relies on defensive tactics. 
 
 ## Main Current Features:
 - Object oriented inventory and crafting with server enforcement
@@ -18,7 +18,7 @@ PodWars is a competitive multiplayer survival experience that relies on defensiv
 
 ## Folder Structure:
 - Lobby: The initial game players join. Facilitates teleportation to the battlefield.
-- Battlefield: The main location where players play a round of PodWars.
+- Battlefield: The main location where players play a round of Pod Wars.
 - Client: Scripts ran by the client
 - ClientModules: ModuleScripts ran by the client
 - Server: Scripts ran by the server
@@ -36,4 +36,4 @@ PodWars is a competitive multiplayer survival experience that relies on defensiv
 ## Notes:
 - Roblox provides a 3d workspace with humanoid/character logic. There are built in services to facilitate physics, graphics, saving data, object property manipulation, etc.
 - Code readability, organization, and application of conventions are being worked on. This was a solo project I designed around what I found appealing.
-- PodWars was originally made for personal growth, entertainment, and for friends. It is not intended for commercial use.
+- Pod Wars was originally made for personal growth, entertainment, and for friends. It is not intended for commercial use.
