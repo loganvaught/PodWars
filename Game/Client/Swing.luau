@@ -28,11 +28,9 @@ tool.Activated:Connect(function()
 	if debounce == false then
 		print("TOOL ACTIVATED!")
 		-- animations and whatnot
-		local hitItem = rayFunctions.FindFirstPartSwungAt(character.HumanoidRootPart,itemStats.range)
-
-		if hitItem then
-			print("An item was found! Firing to server.")
-			e:FireServer(tonumber(localItem.Classifier),hitItem)
+		local hit = rayFunctions.FindFirstResultSwungAt(character.HumanoidRootPart,itemStats.range)
+		if hit then
+			e:FireServer(tonumber(localItem.Classifier),hit[2],hit[1].Position)
 		end
 		task.wait(itemStats.cooldown)
 		debounce = false

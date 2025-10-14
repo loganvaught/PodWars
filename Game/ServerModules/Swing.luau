@@ -15,7 +15,7 @@ local statsDatabase = require(game:GetService("ReplicatedStorage"):WaitForChild(
 function Swing.new(owner: Player,swingName: string,swingClassifier: number)
 	local newSwing = {}
 	setmetatable(newSwing,Swing)
-	
+
 	newSwing.Class = "Swing"
 	newSwing.Classifier = swingClassifier
 	newSwing.Name = swingName
@@ -26,11 +26,14 @@ function Swing.new(owner: Player,swingName: string,swingClassifier: number)
 	newSwing.Owner = owner
 	newSwing.Amount = 1
 	newSwing.Model.Parent = owner.Backpack
-	
+
 	return newSwing
 end
 
 function Swing:DamagePart(hit: Instance)
+	print("DAMAGE PART RECEIVED: "..hit.Name)
+	-- NOTES TO SELF: VERIFY that the part doesnt belong to the owner.
+	-- 
 	if not Pod then
 		Pod = require(game:GetService("ServerStorage"):WaitForChild("Pod"))
 	end
@@ -54,7 +57,7 @@ function Swing:DamagePart(hit: Instance)
 			end
 			local damageProtectionMultiplier = math.pow(armorMult,armorPoints)
 			local thisDamage = statsDatabase["Swing"][self.Name].baseDamage
-			
+
 			-- local amountToDeal = thisDamage * damageProtectionMultiplier
 			local h = hit.Parent.Humanoid
 			h.Health -= thisDamage
@@ -65,7 +68,7 @@ function Swing:DamagePart(hit: Instance)
 		local thisInfo = statsDatabase["Swing"][self.Name]
 		local thisDamage = thisInfo.baseDamage
 		local resourceMultiplier = thisInfo.resourcesDamage[thisResource.Name]
-		
+
 		if thisResource then
 			local amountToDeal = thisDamage * resourceMultiplier
 			thisResource:Damage(self.Owner,amountToDeal)

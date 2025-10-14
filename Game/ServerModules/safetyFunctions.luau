@@ -50,7 +50,7 @@ safetyFunctions.isTableSafe = function(info: table, parameterTable: table): bool
 			if safetyFunctions.isTableSafe(v, expectedType) == false then
 				return false
 			end
-			 -- table, and all embedded tables past this are safe
+			-- table, and all embedded tables past this are safe
 		elseif typeof(v) == "number" then
 			if safetyFunctions.isNumberSafe(v) == false then
 				return false
@@ -64,11 +64,11 @@ safetyFunctions.isTableSafe = function(info: table, parameterTable: table): bool
 			return false
 		end
 	end
-	
+
 	if indexOn ~= #parameterTable then -- catches if there wre less parameters in info than expected
 		return false
 	end
-	
+
 	return true -- safe
 end
 

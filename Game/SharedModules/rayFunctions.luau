@@ -17,7 +17,7 @@ rayFunctions.VisualizeRay = function(origin,direction,distanceOut,color)
 	end)
 end
 
-rayFunctions.FindFirstValidCollision = function(origin: Vector3,direction: Vector3,distanceOut: number, ignoreTags: {string},ignoreParts:{Instance},ignoreTransparent: boolean, ignoreUncollideable: boolean, debugging: boolean): RaycastResult
+rayFunctions.FindFirstValidCollision = function(origin: Vector3,direction: Vector3,distanceOut: number, ignoreTags: {string},ignoreParts:{Instance},ignoreTransparent: boolean, ignoreUncollideable: boolean, debugging: boolean): table
 	local params = RaycastParams.new()
 	params.IgnoreWater = true
 	params.FilterDescendantsInstances = ignoreParts
@@ -37,19 +37,19 @@ rayFunctions.FindFirstValidCollision = function(origin: Vector3,direction: Vecto
 				if result.Instance:HasTag(v) then isGood = false break end
 			end
 			if isGood and not ((result.Instance.Transparency == 1 and ignoreTransparent == true) or (result.Instance.CanCollide == false and ignoreUncollideable == true)) then 
-				return result
+				return {result,params.FilterDescendantsInstances}
 			end
 			table.insert(params.FilterDescendantsInstances,result.Instance)
 		else
 			-- there was no result
-			return nil
+			return {nil, params.FilterDescendantsInstances}
 		end
 		iterations += 1
 	until iterations > 10
-	return nil
+	return {nil, params.FilterDescendantsInstances}
 end
 
-rayFunctions.FindFirstPartSwungAt = function(hrp: Instance,range: number)
+rayFunctions.FindFirstResultSwungAt = function(hrp: Instance,range: number): RaycastResult
 	print("Doing Swing Routine")
 	if hrp and hrp.Parent and hrp.Parent:FindFirstChild("Humanoid") and hrp.Parent:FindFirstChild("Humanoid").Health > 0 then
 		local elevation = 1
@@ -61,10 +61,9 @@ rayFunctions.FindFirstPartSwungAt = function(hrp: Instance,range: number)
 				local origin = (hrp.CFrame * CFrame.new(1,elevation,-0.5)).Position -- sets the origin at the front right edge of the hrp
 				local unitDirection = (hrp.CFrame * CFrame.Angles(0,math.rad(90 - angle),0)).LookVector
 				local hit = rayFunctions.FindFirstValidCollision(origin,unitDirection, range - i/4, {}, {hrp.Parent, --[[workspace.Terrain]]},true,true)
-				local hitItem = hit.Instance
-				if hitItem then
-					print("Hit item!")
-					return hitItem
+				
+				if hit[1] then 
+					return hit
 				end
 				angle -= 30
 				task.wait()
@@ -74,10 +73,8 @@ rayFunctions.FindFirstPartSwungAt = function(hrp: Instance,range: number)
 			local origin = (hrp.CFrame * CFrame.new(0,elevation,-0.5)).Position -- at the front vertical line
 			local unitDirection = hrp.CFrame.LookVector
 			local hit = rayFunctions.FindFirstValidCollision(origin,unitDirection, range, {}, {hrp.Parent},true,true,false)
-			local hitItem = hit.Instance
-			if hitItem then
-				print("Hit item!")
-				return hitItem
+			if hit[1] then
+				return hit
 			end
 			elevation -= 1
 		end
@@ -85,10 +82,10 @@ rayFunctions.FindFirstPartSwungAt = function(hrp: Instance,range: number)
 	end
 end
 
-rayFunctions.IsPartTangibleBetweenPoints = function(pointOne: Vector3, pointTwo: Vector2, ignoreParts: {Instance}): boolean
+rayFunctions.IsPathBlocked = function(pointOne: Vector3, pointTwo: Vector2, ignoreParts: {Instance}): boolean
 	local unit = (pointOne - pointTwo).Unit
 	local magnitude = (pointOne - pointTwo).Magnitude
-	local result = rayFunctions.FindFirstValidCollision(pointOne,unit,magnitude,{},ignoreParts,true,true,true)
+	local result = rayFunctions.FindFirstValidCollision(pointOne,unit,magnitude,{},ignoreParts,true,true,true)[1]
 
 	if result == nil then
 		return true -- nothing is in the way
