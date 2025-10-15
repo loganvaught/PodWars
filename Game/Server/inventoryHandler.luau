@@ -1,4 +1,9 @@
 -- Script description: Handles client updating inventory, and inventory initialization.
+--[[
+Handles client inventory updating.
+
+Inventory objects are instantiated with 5 server modules ("object scripts"), such as Food, Resource, Ranged, Swing, 
+]]
 
 local inventoryEvent = game:GetService("ServerStorage"):WaitForChild("serverEvents"):WaitForChild("inventoryServerEvent")
 local clientEvent = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("inventoryClient")
