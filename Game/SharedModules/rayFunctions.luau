@@ -1,6 +1,7 @@
 local rayFunctions = {
 	maxRays = 10,
 }
+local cs = game:GetService("CollectionService")
 
 rayFunctions.VisualizeRay = function(origin,direction,distanceOut,color)
 	local rayVisualizer1 = Instance.new("Part")
@@ -10,6 +11,7 @@ rayFunctions.VisualizeRay = function(origin,direction,distanceOut,color)
 	rayVisualizer1.Size = Vector3.new(0.1, 0.1, (origin - target).Magnitude) -- thin and long
 	rayVisualizer1.CFrame = CFrame.new(origin, target) * CFrame.new(0, 0, -rayVisualizer1.Size.Z / 2)
 	rayVisualizer1.Color = color
+	cs:AddTag(rayVisualizer1, "rayIgnore")
 	rayVisualizer1.Parent = workspace
 	task.spawn(function()
 		task.wait(3)
@@ -32,20 +34,25 @@ rayFunctions.FindFirstValidCollision = function(origin: Vector3,direction: Vecto
 		local result = workspace:Raycast(origin,direction * distanceOut,params)
 		if result and result.Instance then
 			-- ensure that it doesnt have an ignore tag
-			local isGood = true 
 			for _,v in pairs(ignoreTags)  do
-				if result.Instance:HasTag(v) then isGood = false break end
+				if result.Instance:HasTag(v) then print("Ignore this part. Had tag") break end
 			end
-			if isGood and not ((result.Instance.Transparency == 1 and ignoreTransparent == true) or (result.Instance.CanCollide == false and ignoreUncollideable == true)) then 
+			if not ((result.Instance.Transparency == 1 and ignoreTransparent == true) or (result.Instance.CanCollide == false and ignoreUncollideable == true)) then 
+				print("RESULT: ", result.Instance)
 				return {result,params.FilterDescendantsInstances}
 			end
-			table.insert(params.FilterDescendantsInstances,result.Instance)
+			print("Adding to filter list: ",result.Instance)
+			local currentParams = params.FilterDescendantsInstances
+			table.insert(currentParams, result.Instance)
+			params.FilterDescendantsInstances = currentParams
 		else
 			-- there was no result
+			print("NO RESULT")
 			return {nil, params.FilterDescendantsInstances}
 		end
 		iterations += 1
 	until iterations > 10
+	print("NO RESULT")
 	return {nil, params.FilterDescendantsInstances}
 end
 
@@ -72,7 +79,7 @@ rayFunctions.FindFirstResultSwungAt = function(hrp: Instance,range: number): Ray
 			print("Straight out")
 			local origin = (hrp.CFrame * CFrame.new(0,elevation,-0.5)).Position -- at the front vertical line
 			local unitDirection = hrp.CFrame.LookVector
-			local hit = rayFunctions.FindFirstValidCollision(origin,unitDirection, range, {}, {hrp.Parent},true,true,false)
+			local hit = rayFunctions.FindFirstValidCollision(origin,unitDirection, range, {"rayIgnore"}, {hrp.Parent},true,true,false)
 			if hit[1] then
 				return hit
 			end
@@ -85,7 +92,7 @@ end
 rayFunctions.IsPathBlocked = function(pointOne: Vector3, pointTwo: Vector2, ignoreParts: {Instance}): boolean
 	local unit = (pointOne - pointTwo).Unit
 	local magnitude = (pointOne - pointTwo).Magnitude
-	local result = rayFunctions.FindFirstValidCollision(pointOne,unit,magnitude,{},ignoreParts,true,true,true)[1]
+	local result = rayFunctions.FindFirstValidCollision(pointOne,unit,magnitude,{"rayIgnore"},ignoreParts,true,true,true)[1]
 
 	if result == nil then
 		return true -- nothing is in the way

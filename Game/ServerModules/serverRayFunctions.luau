@@ -23,18 +23,18 @@ serverRayFunctions.GetObstructingParts = function(character: Instance,ignorePart
 	local result = rayFunctions.FindFirstValidCollision(center.Position, (pointOne.Position - center.Position).Unit, 
 		(center.Position - pointOne.Position).Magnitude, {}, ignoreParts, true, true, true)
 
-	if result  then
+	if result [1] then
 		-- There was a part in the way. Return this as a hit
-		return result.Instance
+		return result[1].Instance
 	end
 
 	-- Check from base of arm to end of arm
 	local result2 = rayFunctions.FindFirstValidCollision(pointOne.Position, (pointTwo.Position - pointOne.Position).Unit, 
 		(pointOne.Position - pointTwo.Position).Magnitude, {}, ignoreParts, true, true, true)
 
-	if result2  then
+	if result2[1]  then
 		-- There was a part in the way. Return this as a hit
-		return result2.Instance
+		return result2[1].Instance
 	end
 	
 	return nil -- No obstructing parts
@@ -111,9 +111,9 @@ serverRayFunctions.GetHitPart = function(playerFrom: Player, ignoreParts: {Insta
 	
 	local result = rayFunctions.FindFirstValidCollision(startPoint.Position, (endPosition - startPoint.Position).Unit, 
 		(startPoint.Position - endPosition).Magnitude + 1, {}, ignoreParts, true, true, true)
-	if result then
+	if result[1] then
 		-- There was a part. Return this as a hit
-		return result.Instance
+		return result[1].Instance
 	end
 	
 	-- 2)
@@ -130,10 +130,10 @@ serverRayFunctions.GetHitPart = function(playerFrom: Player, ignoreParts: {Insta
 		
 		-- 4)
 		local result = rayFunctions.FindFirstValidCollision(startPoint.Position, (newEnd - startPoint.Position).Unit, 
-			(startPoint.Position - newEnd).Magnitude + 1, {}, ignoreParts, true, true, true)
+			(startPoint.Position - newEnd).Magnitude + 1, {"rayIgnore"}, ignoreParts, true, true, true)
 		
-		if result then
-			return result.Instance
+		if result[1] then
+			return result[1].Instance
 		end
 		
 		rayOn += 1

@@ -40,8 +40,8 @@ e.OnServerEvent:Connect(function(client,weaponClassifier,ignoreParts,endPosition
 				if plrCharacter then
 					local humanoid = plrCharacter:FindFirstChild("Humanoid")
 					local hrp = plrCharacter:FindFirstChild("HumanoidRootPart")
-					local rightArm = plrCharacter:FindFirstChild("RightArm")
-					if humanoid and hrp and humanoid.Health > 0 and rightArm then-- player can do damage, because they exist and are alive.
+					local rightHand = plrCharacter:FindFirstChild("RightHand")
+					if humanoid and hrp and humanoid.Health > 0 and rightHand then-- player can do damage, because they exist and are alive.
 						print("Final verification step:")
 						local range = statsDatabase["Swing"][thisItem.Name].range
 						if (endPosition - hrp.Position).Magnitude <= range + 2 then -- max distance expected
