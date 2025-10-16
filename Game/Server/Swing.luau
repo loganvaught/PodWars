@@ -20,7 +20,8 @@ function canCooldownThenAdd(plr,weaponName)
 	else
 		thisRegistry[weaponName] = true
 		task.spawn(function()
-			task.wait()-- wait the weapon cooldown (subtract a little to account for server-client lag. client started counting down earlier)
+			local cooldown = statsDatabase.Swing[weaponName].cooldown
+			task.wait(cooldown)-- wait the weapon cooldown (subtract a little to account for server-client lag. client started counting down earlier)
 			thisRegistry[weaponName] = nil
 		end)
 		return true -- player can swing.
@@ -89,3 +90,4 @@ end)
 -- the parent of the hit item? The goal is that cansee doesnt see any other part in the way
 -- implement hierarchy traversal in the Swing module to ensure a player is validly detected
 -- implement hierarchy traversal in the hitpart to see if it belongs to a player, to exclude the entire character module
+-- SHOuld the cooldown be placed exactly at the beginning? Worried about the safety checks being too demanding

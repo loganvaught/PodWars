@@ -100,7 +100,7 @@ function Pod:LoadPod(skin,official)
 				-- XV add other essenial pod startup stuff. What is visible what is not?
 				-- What is enabled what is disabled? (prox prompts)
 				-- keep in mind that proximity prompts will not work if the game has not begun
-				
+
 				self.PhysicalPod = nil
 
 			else
@@ -126,7 +126,7 @@ function Pod:LoadPod(skin,official)
 						-- remove the empty skin if there is one
 						local currentSkin = activePods:FindFirstChild(self.Slot)
 						if currentSkin then currentSkin:Destroy() end
-						
+
 						-- set default transparency and collide values, and also categorizing damage parts
 						for _,v in pairs(clonedSkin:GetDescendants()) do
 							if v:IsA("BasePart")   then
@@ -147,9 +147,9 @@ function Pod:LoadPod(skin,official)
 								self.ProxPrompts[v.Name] = v
 							end
 						end
-						
+
 						self.PhysicalPod = clonedSkin
-						
+
 						local starterScripts = workspace:WaitForChild("podFunctionality"):WaitForChild("starterScripts")
 						clonedSkin.Parent = activePods
 						for _,v in pairs(starterScripts:GetChildren()) do
@@ -162,8 +162,8 @@ function Pod:LoadPod(skin,official)
 						-- XV add other essenial pod startup stuff. What is visible what is not?
 						-- What is enabled what is disabled? (prox prompts)
 						-- keep in mind that proximity prompts will not work if the game has not begun
-						
-						
+
+
 					else
 						self.Owner:Kick("Skin doesnt exist.")
 					end
@@ -277,7 +277,7 @@ function Pod:DamageSection(sectionName,amount)
 	-- valid section names: body, door
 	-- to find a parts damage component, search with tag: damageComponent. if it does not have this tag, it is not damageable
 	-- it also must have attribute "damageable" = "pod"
-	
+
 	-- ensure the unit exists
 	if sectionName == "door" or sectionName == "body" then
 		local thisHealth = self.ItemHealths[sectionName]

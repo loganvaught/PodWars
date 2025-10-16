@@ -30,44 +30,36 @@ rayFunctions.FindFirstValidCollision = function(origin: Vector3,direction: Vecto
 
 	local iterations = 1
 	repeat
-		print("Firing Ray")
 		local result = workspace:Raycast(origin,direction * distanceOut,params)
 		if result and result.Instance then
 			-- ensure that it doesnt have an ignore tag
 			for _,v in pairs(ignoreTags)  do
-				if result.Instance:HasTag(v) then print("Ignore this part. Had tag") break end
+				if result.Instance:HasTag(v) then break end
 			end
 			if not ((result.Instance.Transparency == 1 and ignoreTransparent == true) or (result.Instance.CanCollide == false and ignoreUncollideable == true)) then 
-				print("RESULT: ", result.Instance)
 				return {result,params.FilterDescendantsInstances}
 			end
-			print("Adding to filter list: ",result.Instance)
 			local currentParams = params.FilterDescendantsInstances
 			table.insert(currentParams, result.Instance)
 			params.FilterDescendantsInstances = currentParams
 		else
 			-- there was no result
-			print("NO RESULT")
 			return {nil, params.FilterDescendantsInstances}
 		end
 		iterations += 1
 	until iterations > 10
-	print("NO RESULT")
 	return {nil, params.FilterDescendantsInstances}
 end
 
 rayFunctions.FindFirstResultSwungAt = function(hrp: Instance,range: number): RaycastResult
-	print("Doing Swing Routine")
 	if hrp and hrp.Parent and hrp.Parent:FindFirstChild("Humanoid") and hrp.Parent:FindFirstChild("Humanoid").Health > 0 then
 		local elevation = 1
 		for i = 1, 3 do -- the three floors
-			print("Floor: "..tostring(i))
 			local angle = 120 - 10 * i
 			for i = 1, 4 do
-				print("Angle: "..tostring(angle))
 				local origin = (hrp.CFrame * CFrame.new(1,elevation,-0.5)).Position -- sets the origin at the front right edge of the hrp
 				local unitDirection = (hrp.CFrame * CFrame.Angles(0,math.rad(90 - angle),0)).LookVector
-				local hit = rayFunctions.FindFirstValidCollision(origin,unitDirection, range - i/4, {}, {hrp.Parent, --[[workspace.Terrain]]},true,true)
+				local hit = rayFunctions.FindFirstValidCollision(origin,unitDirection, range - i/4, {}, {hrp.Parent, --[[workspace.Terrain]]},true,true,false)
 				
 				if hit[1] then 
 					return hit
@@ -76,7 +68,6 @@ rayFunctions.FindFirstResultSwungAt = function(hrp: Instance,range: number): Ray
 				task.wait()
 			end
 			-- fifth ray straight out
-			print("Straight out")
 			local origin = (hrp.CFrame * CFrame.new(0,elevation,-0.5)).Position -- at the front vertical line
 			local unitDirection = hrp.CFrame.LookVector
 			local hit = rayFunctions.FindFirstValidCollision(origin,unitDirection, range, {"rayIgnore"}, {hrp.Parent},true,true,false)
@@ -92,7 +83,7 @@ end
 rayFunctions.IsPathBlocked = function(pointOne: Vector3, pointTwo: Vector2, ignoreParts: {Instance}): boolean
 	local unit = (pointOne - pointTwo).Unit
 	local magnitude = (pointOne - pointTwo).Magnitude
-	local result = rayFunctions.FindFirstValidCollision(pointOne,unit,magnitude,{"rayIgnore"},ignoreParts,true,true,true)[1]
+	local result = rayFunctions.FindFirstValidCollision(pointOne,unit,magnitude,{"rayIgnore"},ignoreParts,true,true,false)[1]
 
 	if result == nil then
 		return true -- nothing is in the way

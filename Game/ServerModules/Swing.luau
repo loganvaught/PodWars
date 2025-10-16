@@ -32,20 +32,26 @@ end
 
 function Swing:DamagePart(hit: Instance)
 	print("DAMAGE PART RECEIVED: "..hit.Name)
-	-- NOTES TO SELF: VERIFY that the part doesnt belong to the owner.
-	-- 
+
+	-- WORK AROUND FOR AVOIDING RECURSIVE REQUIRE ON MODULES. CHANGE LATER XV
 	if not Pod then
 		Pod = require(game:GetService("ServerStorage"):WaitForChild("Pod"))
 	end
 	if not Harvestable then
 		Harvestable = require(game:GetService("ServerStorage"):WaitForChild("Harvestable"))
 	end
+	
 	-- Is it a player
 	if hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
-		-- armor info is stored in the plr object. in a folder called "armor", and each piece is a num value with weights. EG chestplate is 0.65, leggings is 0.35
+		print("Damage player")
+		-- armor info is stored in the plr object. in a folder called "armor", 
+		-- and each piece is an int value with armor points.
+		-- 1 total armor point = an exact reduction in damage dealt,
+		-- by the armor constant: armorMult
+		
 		-- IN THE FUTURE: Armor will be another class: wearables.
 		local plr = game:GetService("Players"):GetPlayerFromCharacter(hit.Parent)
-		if plr then
+		if plr and plr ~= self.Owner then
 			local armorFolder = plr:FindFirstChild("armor")
 			-- local damageReduction
 			local armorMult = statsDatabase["Swing"][self.Name].damageMultiplierPerArmorPoint
@@ -62,8 +68,9 @@ function Swing:DamagePart(hit: Instance)
 			local h = hit.Parent.Humanoid
 			h.Health -= thisDamage
 		end
-	elseif hit:GetAttribute("damageable") == "resource" then
+	elseif hit:GetAttribute("damageable") == "resource" then -- is it a resource
 		-- do damage to resource
+		print("Damage resource")
 		local thisResource = Harvestable.GetObjectFromFolder(hit.Parent) -- assumes the damageable part is directly a descendant
 		local thisInfo = statsDatabase["Swing"][self.Name]
 		local thisDamage = thisInfo.baseDamage
@@ -73,17 +80,22 @@ function Swing:DamagePart(hit: Instance)
 			local amountToDeal = thisDamage * resourceMultiplier
 			thisResource:Damage(self.Owner,amountToDeal)
 		end
-	elseif hit:GetAttribute("damageable") == "pod" then
+	elseif hit:GetAttribute("damageable") == "pod" then -- is it a pod
+		print("Damage pod")
 		-- do damage to pod
+		-- Pod parts marked as damageable should have the following tags, which specify which slot
+		-- it is from, and which segment of the pod is damaged
 		local component = hit:GetAttribute("damageComponent")
 		local slotNumber = hit:GetAttribute("slotNumberBelongs")
 		if slotNumber and component then
 			local thisPod = Pod.GetPodFromSlotNumber(slotNumber)
-			local thisInfo = statsDatabase["Swing"][self.Name]
-			local thisDamage = thisInfo.baseDamage
-			local sectionMultiplier = thisInfo.podDamage[component]
-			local amountToDamage = thisDamage * sectionMultiplier
-			thisPod:DamageSection(component,amountToDamage)
+			if thisPod and thisPod.Owner ~= self.Owner then
+				local thisInfo = statsDatabase["Swing"][self.Name]
+				local thisDamage = thisInfo.baseDamage
+				local sectionMultiplier = thisInfo.podDamage[component]
+				local amountToDamage = thisDamage * sectionMultiplier
+				thisPod:DamageSection(component,amountToDamage)
+			end
 		end
 	end
 end

@@ -26,6 +26,7 @@ local debounce = false
 tool.Activated:Connect(function()
 	task.wait(0.2) -- wind up period
 	if debounce == false then
+		debounce = true
 		print("TOOL ACTIVATED!")
 		-- animations and whatnot
 		local hit = rayFunctions.FindFirstResultSwungAt(character.HumanoidRootPart,itemStats.range)

@@ -21,7 +21,7 @@ serverRayFunctions.GetObstructingParts = function(character: Instance,ignorePart
 	
 	-- Check from center of character to base of arm
 	local result = rayFunctions.FindFirstValidCollision(center.Position, (pointOne.Position - center.Position).Unit, 
-		(center.Position - pointOne.Position).Magnitude, {}, ignoreParts, true, true, true)
+		(center.Position - pointOne.Position).Magnitude, {}, ignoreParts, true, true, false)
 
 	if result [1] then
 		-- There was a part in the way. Return this as a hit
@@ -30,7 +30,7 @@ serverRayFunctions.GetObstructingParts = function(character: Instance,ignorePart
 
 	-- Check from base of arm to end of arm
 	local result2 = rayFunctions.FindFirstValidCollision(pointOne.Position, (pointTwo.Position - pointOne.Position).Unit, 
-		(pointOne.Position - pointTwo.Position).Magnitude, {}, ignoreParts, true, true, true)
+		(pointOne.Position - pointTwo.Position).Magnitude, {}, ignoreParts, true, true, false)
 
 	if result2[1]  then
 		-- There was a part in the way. Return this as a hit
@@ -110,7 +110,7 @@ serverRayFunctions.GetHitPart = function(playerFrom: Player, ignoreParts: {Insta
 	local startPoint = rightHand.CFrame -- The end of the arm
 	
 	local result = rayFunctions.FindFirstValidCollision(startPoint.Position, (endPosition - startPoint.Position).Unit, 
-		(startPoint.Position - endPosition).Magnitude + 1, {}, ignoreParts, true, true, true)
+		(startPoint.Position - endPosition).Magnitude + 1, {}, ignoreParts, true, true, false)
 	if result[1] then
 		-- There was a part. Return this as a hit
 		return result[1].Instance
@@ -130,7 +130,7 @@ serverRayFunctions.GetHitPart = function(playerFrom: Player, ignoreParts: {Insta
 		
 		-- 4)
 		local result = rayFunctions.FindFirstValidCollision(startPoint.Position, (newEnd - startPoint.Position).Unit, 
-			(startPoint.Position - newEnd).Magnitude + 1, {"rayIgnore"}, ignoreParts, true, true, true)
+			(startPoint.Position - newEnd).Magnitude + 1, {"rayIgnore"}, ignoreParts, true, true, false)
 		
 		if result[1] then
 			return result[1].Instance
