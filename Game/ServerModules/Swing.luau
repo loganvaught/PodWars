@@ -40,7 +40,7 @@ function Swing:DamagePart(hit: Instance)
 	if not Harvestable then
 		Harvestable = require(game:GetService("ServerStorage"):WaitForChild("Harvestable"))
 	end
-	
+
 	-- Is it a player
 	if hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
 		print("Damage player")
@@ -48,7 +48,7 @@ function Swing:DamagePart(hit: Instance)
 		-- and each piece is an int value with armor points.
 		-- 1 total armor point = an exact reduction in damage dealt,
 		-- by the armor constant: armorMult
-		
+
 		-- IN THE FUTURE: Armor will be another class: wearables.
 		local plr = game:GetService("Players"):GetPlayerFromCharacter(hit.Parent)
 		if plr and plr ~= self.Owner then

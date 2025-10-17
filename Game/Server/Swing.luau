@@ -47,9 +47,9 @@ e.OnServerEvent:Connect(function(client,weaponClassifier,ignoreParts,endPosition
 						local range = statsDatabase["Swing"][thisItem.Name].range
 						if (endPosition - hrp.Position).Magnitude <= range + 2 then -- max distance expected
 							-- Check to make sure theres no obstructing parts from the character to the arm
-							
+
 							local obstructingPart = serverRayFunctions.GetObstructingParts(plrCharacter,ignoreParts)
-							
+
 							if not obstructingPart then
 								-- ensure theres a clear path from humanoid root part to the instance (check center, and the two front sides of the part)
 								local pointOnes = { -- assuming default huamnoid root part size
@@ -58,7 +58,7 @@ e.OnServerEvent:Connect(function(client,weaponClassifier,ignoreParts,endPosition
 									(hrp.CFrame * CFrame.new(0,0,-0.5)).Position, -- Center, front
 									(hrp.CFrame * CFrame.new(0,1,-0.5)).Position, -- Top center, front
 								}
-								
+
 								for _,v in pairs(pointOnes) do -- series of rays to determine if theres a hit near the endpoint
 									obstructingPart = serverRayFunctions.GetHitPart(client,ignoreParts,endPosition)
 									if obstructingPart then 
@@ -66,6 +66,7 @@ e.OnServerEvent:Connect(function(client,weaponClassifier,ignoreParts,endPosition
 									end
 								end
 							end
+
 							if obstructingPart then
 								-- fire the object's hit event with the hitItem parameter. it will do all the checks
 								print("Sending damage")
