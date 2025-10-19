@@ -89,7 +89,9 @@ function Swing:DamagePart(hit: Instance)
 		local slotNumber = hit:GetAttribute("slotNumberBelongs")
 		if slotNumber and component then
 			local thisPod = Pod.GetPodFromSlotNumber(slotNumber)
+			print("Damaging this pod attempt")
 			if thisPod and thisPod.Owner ~= self.Owner then
+				print("Damaging this pod")
 				local thisInfo = statsDatabase["Swing"][self.Name]
 				local thisDamage = thisInfo.baseDamage
 				local sectionMultiplier = thisInfo.podDamage[component]

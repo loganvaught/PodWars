@@ -30,10 +30,11 @@ tool.Activated:Connect(function()
 		print("TOOL ACTIVATED!")
 		-- animations and whatnot
 		local hit = rayFunctions.FindFirstResultSwungAt(character.HumanoidRootPart,itemStats.range)
+		print(hit)
 		if hit then
 			e:FireServer(tonumber(localItem.Classifier),hit[2],hit[1].Position)
 		end
-		task.wait(itemStats.cooldown)
+		task.wait(itemStats.cooldown + 0.1)
 		debounce = false
 	end
 end)

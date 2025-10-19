@@ -273,22 +273,29 @@ function Pod:Remove()
 	self.Active = false
 end
 
+function Pod:BreakSection(sectionName)
+	print("Destroying Section: "..sectionName)
+	for _,v in pairs(self.ItemsBySection[sectionName]) do
+		print(v)
+		v.Transparency = 1
+		v.CanCollide = false
+	end
+end
+
 function Pod:DamageSection(sectionName,amount)
 	-- valid section names: body, door
 	-- to find a parts damage component, search with tag: damageComponent. if it does not have this tag, it is not damageable
 	-- it also must have attribute "damageable" = "pod"
 
 	-- ensure the unit exists
+	print("-- Damage Sent --")
 	if sectionName == "door" or sectionName == "body" then
 		local thisHealth = self.ItemHealths[sectionName]
 		if thisHealth > 0 then-- ensure the unit can take damage
-			thisHealth -= amount
-			if thisHealth <= 0 then
+			self.ItemHealths[sectionName] -= amount
+			if self.ItemHealths[sectionName] <= 0 then
 				-- destroy this items groups
-				for _,v in pairs(self.ItemsBySection[sectionName]) do
-					v.Transparency = 1
-					v.CanCollide = false
-				end
+				self:BreakSection(sectionName)
 			end
 		end
 	end

@@ -3,6 +3,10 @@ local serverRayFunctions = {}
 local rayFunctions = require(game:GetService("ReplicatedStorage"):WaitForChild("dictionaries"):WaitForChild("rayFunctions"))
 
 serverRayFunctions.GetObstructingParts = function(character: Instance,ignoreParts: {Instance}): Instance
+	print("GET OBSTRUCTING PARTS Ignore Parts: ")
+	for _,v in pairs(ignoreParts) do
+		print(v)
+	end
 	--[[
 	IT IS ASSUMED
 	that character has all the necessary parts
@@ -41,6 +45,10 @@ serverRayFunctions.GetObstructingParts = function(character: Instance,ignorePart
 end
 
 serverRayFunctions.GetHitPart = function(playerFrom: Player, ignoreParts: {Instance}, endPosition: Vector3): boolean
+	print("GET HIT PART Ignore Parts: ")
+	for _,v in pairs(ignoreParts) do
+		print(v)
+	end
 	--[[
 	
 	The client detects when they hit an object, and fires a request to the server.
@@ -91,11 +99,18 @@ serverRayFunctions.GetHitPart = function(playerFrom: Player, ignoreParts: {Insta
 			indexOn += 1 
 			if i ~= indexOn then return nil end -- non numerical index. Will not check for hit parts
 			
+			-- make sure it is either a part,...
 			if v:IsA("BasePart") or v:IsA("MeshPart") then
-				if v.Transparency == 1 or v.CanCollide == true then
+				-- make sure it is ignorable: it is transparent, or uncollideable
+				if v.Transparency == 1 or v.CanCollide == false then
 					table.insert(newTable,v)
 				end
 			end
+			-- ..or the model of the players character that sent the request
+			if (v == playerFrom.Character) then
+				table.insert(newTable,v)
+			end
+			
 			if i >= 10 then -- Will not check more than 10 values. Only 10 are possible assuming regular conditions
 				break
 			end

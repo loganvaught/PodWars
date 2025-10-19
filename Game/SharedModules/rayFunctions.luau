@@ -36,8 +36,14 @@ rayFunctions.FindFirstValidCollision = function(origin: Vector3,direction: Vecto
 			for _,v in pairs(ignoreTags)  do
 				if result.Instance:HasTag(v) then break end
 			end
-			if not ((result.Instance.Transparency == 1 and ignoreTransparent == true) or (result.Instance.CanCollide == false and ignoreUncollideable == true)) then 
-				return {result,params.FilterDescendantsInstances}
+			-- check if is not transparent if ignore transparent is on
+			if not (result.Instance.Transparency == 1 and ignoreTransparent == true) then 
+				-- check if collideable if ignore uncollideable is on, or is a part that belongs to a character that is alive
+				if not (result.Instance.CanCollide == false and ignoreUncollideable == true) 
+				or (result.Instance.Parent and result.Instance.Parent:FindFirstChild("Humanoid") 
+				and result.Instance.Parent.Humanoid.Health > 0) then
+					return {result,params.FilterDescendantsInstances}
+				end
 			end
 			local currentParams = params.FilterDescendantsInstances
 			table.insert(currentParams, result.Instance)

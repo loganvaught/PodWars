@@ -1,7 +1,8 @@
 local module = {
 	timeToWaitForPlayers = 30,
 	minimumPlayers = 1,
-	debugMode = true,
+	debugMode = false,
+	numberStarterFrames = 4,
 }
 
 return module
