@@ -39,10 +39,10 @@ function beginPod(profile,pod) -- XV THIS IS NEXT
 	print("Beginning this users pod")
 	-- should we wait for anything to ensure pod is ready to be opened?
 	-- this function is only called once the game has begun
-	
+
 	-- make their pods open and toggle all their items 
 	pod:ToggleDoor()
-	
+
 
 	-- unlock proximity prompts with pod:Unlock(prompt)
 	pod:Unlock("door")
@@ -67,15 +67,13 @@ local function newPlayer(plr,loadedLate) -- put them in their pod and whatnot wh
 		local playerSkin = playerData.equippedSkin
 		local podAssigned = Pod.GetPodFromUserId(plr.UserId)
 		if podAssigned then
-			print("- The user ID is associated with a pod. +")
 			podAssigned:OfficializePod(plr,playerSkin) -- load player skin and attach their name to the pod
 		end
 		-- make new profile for the player
-		print("Beginning profile creation.")
-		
+
 		local newProfile = Profile.new(plr,podAssigned)
-		
-		
+
+
 		plr.CharacterAdded:Connect(function(c) -- handles respawning
 			local h = c:WaitForChild("Humanoid")
 			local hrp = c:WaitForChild("HumanoidRootPart")
@@ -84,7 +82,7 @@ local function newPlayer(plr,loadedLate) -- put them in their pod and whatnot wh
 			else
 				print("Player spawned but had no pod.")
 			end
-			
+
 			h.Died:Connect(function() -- PLAYER HAS DIED
 				deathEvent:Fire(plr,newProfile,podAssigned)
 			end)
@@ -135,9 +133,7 @@ game:GetService("Players").PlayerAdded:Connect(function(plr)
 	until data and approved
 	if gameStartedValue.Value == true then -- player arrived late
 		if gameEndedValue.Value == false then
-			print("Player arrived late")
 			if table.find(data.ids,plr.UserId) then -- player is allowed
-				print("Late player verified.")
 				repeat 
 					task.wait() 
 				until gameStartedValue.Value == true
@@ -157,28 +153,22 @@ game:GetService("Players").PlayerRemoving:Connect(function(plr) -- processes the
 	repeat 
 		task.wait() 
 	until data and approved
-	print("Player left")
 	if gameStartedValue.Value == false then
 		-- remove their id from expected ids
 		if table.find(playersReady,plr) then
-			print("Player was ready")
 			table.remove(playersReady,table.find(playersReady,plr))
 		end
 		if table.find(data.ids,plr.UserId) then
-			print("Player was valuable")
 			table.remove(data.ids,table.find(data.ids,plr.UserId))
 		end
 	end
 	local plrProfile = Profile.getProfileFromOwner(plr)
 	if plrProfile then -- if the player has a profile, it will be removed, and if theres a pod, it will be removed as well. if the player doesn't have a profile, a loading ban will be added
-		print("Profile existed.")
 		plrProfile:Remove("left") -- this will stop them from competing and remove a pod if it exists
 	else
-		print("Profile did not exist.")
 		Profile.addLoadingBan(plr.UserId) -- stops profile and pod from being made, so they dont enter competition
 		local theoreticalPod = Pod.GetPodFromUserId(plr.UserId) -- gets rid of a pod of it exists
 		if theoreticalPod then
-			print("Theoretical pod existed.")
 			theoreticalPod:Remove()
 		end
 	end
@@ -188,24 +178,20 @@ repeat
 	task.wait() 
 until data and approved
 
+-- randomly organizes assignedSlots where i (pod slot number) = playerId
 
-print("LETS GO")
+local availableSlots = {}
 
--- randomly make assignedSlots where i (pot slot number) = playerId
-local numIds = #data.ids
-for i = numIds, 1,-1 do
-	local j = math.random(1,i)
-	local temp = data.ids[j]
-	data.ids[j] = data.ids[i]
-	data.ids[i] = temp
+for i = 1, warConfigs.numberStarterFrames, 1 do
+	table.insert(availableSlots,i)
 end
 
-for i,v in pairs(data.ids) do
-	print(i,v)
-	assignedSlots[i] = v
-	registerPod(v,i)
+for _,v in pairs(data.ids) do
+	local randomSlot = math.random(1,#availableSlots)
+	assignedSlots[randomSlot] = v
+	registerPod(v,randomSlot)
+	table.remove(availableSlots,randomSlot)
 end
-print("XX")
 
 repeat
 	for _,v in pairs(ps:GetPlayers()) do
@@ -215,7 +201,6 @@ repeat
 	end	
 	local countDown = warConfigs.timeToWaitForPlayers
 	repeat -- checking until all players have loaded, or until the max time has surpassed
-		print("Coutndown tick")
 		task.wait(1)
 		numIds = #data.ids
 		for _,v in pairs(ps:GetPlayers()) do
@@ -228,7 +213,6 @@ repeat
 				end
 			end
 			if table.find(playersReady,v) then -- show them the countdown
-				print("PLayer was ready.")
 				loadAnimationRemote:Fire(v,{Hint = "waiting",Text = "Waiting for players: "..tostring(#playersReady).."/"..tostring(numIds).."\nAuto start in "..tostring(countDown).."."})
 			end
 		end
