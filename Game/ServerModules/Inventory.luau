@@ -9,6 +9,7 @@ local classes = {
 	["Ranged"] = require(itemClasses:WaitForChild("Ranged")),
 	["Swing"] = require(itemClasses:WaitForChild("Swing")),
 	["Independent"] = require(itemClasses:WaitForChild("Independent")),
+	["Armor"] = require(itemClasses:WaitForChild("Armor")),
 }
 local classDatabase = require(game:GetService("ReplicatedStorage"):WaitForChild("dictionaries"):WaitForChild("classDatabase"))
 
@@ -46,6 +47,9 @@ Inventory = {
 	}
 	["Ranged"] = { -- Class of items that cast long ranged rays with projectiles
 	
+	},
+	["Armor"] = {
+	
 	}
 }
 ]]
@@ -72,6 +76,7 @@ function Inventory.new(plr)
 			["Ranged"] = {},
 			["Resource"] = {},
 			["Swing"] = {},
+			["Armor"] = {}
 		}
 		newInventory.StackableCache = {}
 		newInventory.Active = true
@@ -193,6 +198,7 @@ function Inventory:Clear()
 		["Ranged"] = {},
 		["Resource"] = {},
 		["Swing"] = {},
+		["Armor"] = {},
 	}
 	classifierToItem = {}
 end

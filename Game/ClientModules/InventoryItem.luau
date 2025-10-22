@@ -1,3 +1,6 @@
+-- A script used as a class where each object represents a frame in the inventory system
+-- for a particular item.
+
 local InventoryItem = {}
 InventoryItem.__index = InventoryItem
 
@@ -5,6 +8,7 @@ local cs = game:GetService("CollectionService")
 local itemToClone = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("guiClones"):WaitForChild("inventory"):WaitForChild("item")
 local itemsFrame = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("main"):WaitForChild("canvas"):WaitForChild("inventory"):WaitForChild("items")
 local hotbar =  game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("main"):WaitForChild("canvas"):WaitForChild("hotbar")
+local armorbar = game:GetService("Players").LocalPlayer.PlayerGui.main.canvas:WaitForChild("armorBar")
 local classDatabase = require(game:GetService("ReplicatedStorage"):WaitForChild("dictionaries"):WaitForChild("classDatabase"))
 local itemDatabase =  require(game:GetService("ReplicatedStorage"):WaitForChild("dictionaries"):WaitForChild("itemDatabase"))
 local independentDatabase =require(game:GetService("ReplicatedStorage"):WaitForChild("dictionaries"):WaitForChild("independentDatabase")) 
@@ -19,6 +23,7 @@ local categoriesByClass = { -- to sort items of classes into categories for sort
 	["Swing"] = "items",
 	["Independent"] = "items",
 	["Ranged"] = "items",
+	["Armor"] = "items",
 }
 local specificCategoriesByName = { -- if an items class doesnt typically identify with it, you can sort it into a different filter category
 	["Arrow"] = "items", -- arrows are seens by the game as a resource. people typically see it as an item.
@@ -29,9 +34,24 @@ local function getCategory(item: Object): string
 end
 
 local hotbarReference = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("guiClones"):WaitForChild("inventory"):WaitForChild("hotbarReference")
+local armorbarReference = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("guiClones"):WaitForChild("inventory"):WaitForChild("armorbarReference")
+
+local function isDigitString(s) -- found online
+	return string.match(s, "^%d+$") ~= nil
+end
+
 local function conditionForLocation(location: string,frame) -- note: leaves frame invisible to avoid weird transitions.
 	frame.Visible = false
-	if location ~= "inventory" then
+	if location == "inventory" then
+		-- inventory
+		frame.ImageTransparency = 0
+		for _,v in pairs(frame:GetChildren()) do
+			local reference = itemToClone:FindFirstChild(v.Name)
+			v.Position = reference.Position
+			v.Size = reference.Size
+			v.Visible = reference.Visible
+		end
+	elseif isDigitString(location) then
 		-- hotbar
 		frame.ImageTransparency = 1
 		for _,v in pairs(frame:GetChildren()) do
@@ -41,10 +61,10 @@ local function conditionForLocation(location: string,frame) -- note: leaves fram
 			v.Visible = reference.Visible
 		end
 	else
-		-- inventory
-		frame.ImageTransparency = 0
+		-- armor bar
+		frame.ImageTransparency = 1
 		for _,v in pairs(frame:GetChildren()) do
-			local reference = itemToClone:FindFirstChild(v.Name)
+			local reference = armorbarReference:FindFirstChild(v.Name)
 			v.Position = reference.Position
 			v.Size = reference.Size
 			v.Visible = reference.Visible
@@ -65,6 +85,10 @@ local pathByLocation = {
 	["3"] = hotbar:WaitForChild("3"),
 	["4"] = hotbar:WaitForChild("4"),
 	["5"] = hotbar:WaitForChild("5"),
+	["head"] = armorbar:WaitForChild("head"),
+	["torso"] = armorbar:WaitForChild("torso"),
+	["legs"] = armorbar:WaitForChild("legs"),
+	["feet"] = armorbar:WaitForChild("feet"),
 }
 local locationRegistry = {
 	["inventory"] = {
@@ -75,6 +99,10 @@ local locationRegistry = {
 	["3"] = {},
 	["4"] = {},
 	["5"] = {},
+	["head"] = {},
+	["torso"] = {},
+	["legs"] = {},
+	["feet"] = {},
 }
 
 local currentlyFiltering = {
@@ -84,12 +112,13 @@ local currentlyFiltering = {
 function InventoryItem.new(itemFor: Item, classifier: number)
 	local newItem = {}
 	setmetatable(newItem,InventoryItem)
-	
+
 	newItem.Category = getCategory(itemFor)
 	newItem.Frame = nil
 	newItem.DraggableItem = nil -- an indicator that its currently being dragged.
 	newItem.Location = nil
 	newItem.Terminated = false
+	newItem.Class = itemFor.Class
 	if itemFor.Class == "independent" then
 		newItem.Stackable = independentDatabase[itemFor.Name].stackable
 	else
@@ -98,7 +127,7 @@ function InventoryItem.new(itemFor: Item, classifier: number)
 	newItem.Classifier = classifier
 	ClassifierToObjectRegistry[classifier] = newItem
 	ObjectToName[newItem] = itemFor.Name
-	
+
 	return newItem
 end
 
@@ -113,7 +142,7 @@ end
 function InventoryItem.ChangeFilter(newFiltering)
 	currentlyFiltering = newFiltering
 end
-function InventoryItem.GetFirstItemInHotbarSlot(n: string)
+function InventoryItem.GetFirstItemInSlot(n: string)
 	for i,_ in pairs(locationRegistry[n]) do
 		return i
 	end
@@ -163,7 +192,7 @@ function InventoryItem:Trade(otherItem: InventoryItem) -- self trades spots with
 	if self.Frame and otherItem.Frame and self.Location and otherItem.Location then
 		local thisParent = self.Frame.Parent
 		local thatParent = otherItem.Frame.Parent
-		
+
 		locationRegistry[self.Location][self] = nil
 		locationRegistry[otherItem.Location][otherItem] = nil
 		locationRegistry[otherItem.Location][self] = true
@@ -171,12 +200,12 @@ function InventoryItem:Trade(otherItem: InventoryItem) -- self trades spots with
 		local oldLocation = self.Location
 		self.Location = otherItem.Location
 		otherItem.Location = oldLocation
-		
+
 		conditionForLocation(self.Location,self.Frame)
 		conditionForLocation(otherItem.Location,otherItem.Frame)
 		self.Frame.Parent = thatParent
 		otherItem.Frame.Parent = thisParent
-		
+
 		self.Frame.Visible = true
 		print(currentlyFiltering)
 		if otherItem.Location == "inventory" then -- visibility filters
@@ -187,8 +216,19 @@ function InventoryItem:Trade(otherItem: InventoryItem) -- self trades spots with
 		else
 			otherItem.Frame.Visible = true
 		end
+		
+		-- unequip a tool if it was being held and is being put away
+		
+		local itemDisplaced = LocalInventory.GetObjectFromClassifier(otherItem.Classifier)
+		if useageFunctions.GetEquippedItem() == itemDisplaced then
+			if otherItem.Location == "inventory" then
+				-- it is now in the inventory
+				useageFunctions.Unequip()
+			end
+		end
 	end
 end
+
 
 function InventoryItem:Move(location: string)
 	if locationRegistry[location][self] == nil then
@@ -206,19 +246,55 @@ function InventoryItem:Move(location: string)
 				self.Frame.Visible = false
 			end
 			self.Frame.Parent = pathByLocation["inventory"]
-		else
-			-- hotbar slot
-			print("Adding to hotbar slot: "..location)
-			local currentItem = InventoryItem.GetFirstItemInHotbarSlot(location)
-			if currentItem then
-				self:Trade(currentItem)
+			
+			-- unequip a tool if it is being held
+			local thisItem = LocalInventory.GetObjectFromClassifier(self.Classifier)
+			if useageFunctions.GetEquippedItem() == thisItem then
+				useageFunctions.Unequip()
+			end
+			
+		elseif isDigitString(location) then
+			-- drop location is in the hotbar
+			if classDatabase[self.Class].equippable == true then
+				-- hotbar slot and can be moved to hotbar
+				print("Adding to hotbar slot: "..location)
+				local currentItem = InventoryItem.GetFirstItemInSlot(location)
+				if currentItem then
+					self:Trade(currentItem)
+				else
+					locationRegistry[self.Location][self] = nil
+					locationRegistry[location][self] = true
+					self.Location = location
+					conditionForLocation(location,self.Frame)
+					self.Frame.Parent = pathByLocation[location]
+					self.Frame.Visible = true
+				end
 			else
-				locationRegistry[self.Location][self] = nil
-				locationRegistry[location][self] = true
-				self.Location = location
-				conditionForLocation(location,self.Frame)
-				self.Frame.Parent = pathByLocation[location]
-				self.Frame.Visible = true
+				print("This item cant go in the hotbar!")
+			end
+		else
+			-- drop location is in the armor bar
+			if classDatabase[self.Class].wearable == true then
+				-- check if the armor piece matches that body location
+				local thisItem = LocalInventory.GetObjectFromClassifier(self.Classifier)
+				if thisItem.BodyLocation == location then
+					print("Adding to armor slot: "..location)
+					local currentItem = InventoryItem.GetFirstItemInSlot(location)
+					if currentItem then
+						self:Trade(currentItem)
+					else
+						locationRegistry[self.Location][self] = nil
+						locationRegistry[location][self] = true
+						self.Location = location
+						conditionForLocation(location,self.Frame)
+						self.Frame.Parent = pathByLocation[location]
+						self.Frame.Visible = true
+					end
+				else
+					print("This armor piece doesnt go here!")
+				end
+			else
+				print("This item cant go in the armor bar!")
 			end
 		end
 	else
@@ -248,7 +324,8 @@ function InventoryItem:Click()
 			print("Clicked item in inventory.")
 			-- in the future, maybe add a visual that says a description of the item, maybe some stats about the item, and a button that says "equip" and "cancel"
 			-- thisItem:LocalClick()
-		else -- hotbar click
+		elseif isDigitString(self.Location) then
+			-- hotbar click
 			print("Clicked item in hotbar.")
 			local properties = nil
 			if thisItem.Class == "independent" then
@@ -257,7 +334,7 @@ function InventoryItem:Click()
 				properties = classDatabase[thisItem.Class]
 			end
 			if properties ~= nil then
-				if properties.equippable == true then
+				if properties.holdable == true then
 					-- equip item
 					useageFunctions.ToggleEquip(thisItem)
 				elseif properties.consumable == true then
@@ -268,6 +345,9 @@ function InventoryItem:Click()
 					useageFunctions.Build(thisItem)
 				end
 			end
+		else
+			-- armor bar click
+			print("Clicked item in armor bar")
 		end
 	else
 		warn("Attempted to click invalid inventory item.")
@@ -284,17 +364,17 @@ end
 function InventoryItem:Remove()
 	if self.Terminated == true then return end
 	self.Terminated = true
-	
+
 	if self.Location ~= nil then
 		locationRegistry[self.Location][self] = nil
 	end
 	ObjectToName[self] = nil
 	ClassifierToObjectRegistry[self.Classifier] = nil
-	
+
 	if self.DraggableItem then 
 		self.DraggableItem:Destroy() 
 	end
-	
+
 	if self.Frame then
 		FrameToObjectRegistry[self.Frame] = nil
 		self.Frame:Destroy()

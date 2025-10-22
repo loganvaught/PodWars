@@ -58,7 +58,7 @@ local function instantiatePanelForItem(itemName,level)
 	-- assume panel will be visible right away
 	loadedItems[itemName] = true
 	visibleItems[itemName] = true
-	 -- attach listen for crafting function
+	-- attach listen for crafting function
 	local clonedPanel = clones:WaitForChild("craft"):WaitForChild("item"):Clone()
 	local resourceLabel = clones:WaitForChild("craft"):WaitForChild("resource")
 	local recipeFrame = clonedPanel:WaitForChild("recipe")
@@ -85,7 +85,7 @@ local function instantiatePanelForItem(itemName,level)
 	clonedPanel:WaitForChild("timer").Text = string.format("Cooldown: %ds",metaData.cooldownByLevel[level])
 	clonedPanel.Parent = buttons
 	listenForCrafting(clonedPanel:WaitForChild("craft"),itemName)
-	
+
 	loadedItems[itemName] = true
 	visibleItems[itemName] = true
 	nameToPanelTable[itemName] = clonedPanel

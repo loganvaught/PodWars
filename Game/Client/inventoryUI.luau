@@ -35,6 +35,7 @@ local functions = {
 }
 
 visualEvent.Event:Connect(function(action: string,classifier: number,info: Item_or_number)
+	print("VISUAL EVENT FIRED")
 	functions[action](classifier,info)
 end)
 
@@ -66,7 +67,7 @@ function filter(category)
 				task.wait()
 			end
 			if v:IsA("ImageLabel") then
-				
+
 				local thisFrame = InventoryItem.GetObjectFromFrame(v)
 				if thisFrame then
 					local thisCategory = thisFrame.Category

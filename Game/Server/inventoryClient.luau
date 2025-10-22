@@ -1,4 +1,4 @@
- -- Script description: Handles client requests to update inventory, and inventory inintialization.
+-- Script description: Handles client requests to update inventory, and inventory inintialization.
 
 local e = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("inventoryClient")
 local serverE = game:GetService("ServerStorage"):WaitForChild("serverEvents"):WaitForChild("inventoryServerEvent")

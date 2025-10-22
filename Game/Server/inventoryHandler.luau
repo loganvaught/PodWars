@@ -1,9 +1,4 @@
 -- Script description: Handles client updating inventory, and inventory initialization.
---[[
-Handles client inventory updating.
-
-Inventory objects are instantiated with 5 server modules ("object scripts"), such as Food, Resource, Ranged, Swing, 
-]]
 
 local inventoryEvent = game:GetService("ServerStorage"):WaitForChild("serverEvents"):WaitForChild("inventoryServerEvent")
 local clientEvent = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("inventoryClient")
@@ -54,20 +49,20 @@ local functions = {
 	updatePlayerClassifierWithProperty = function(plr,classifier,property,value) -- To be called from Inventory object directly
 		clientEvent:FireClient(plr,"updatePlayerClassifierWithProperty",{classifier,property,value})
 	end,
-	
+
 	-- Addition and Removal Update Functions
-	
+
 	updatePlayerRemoveClassifier = function(plr,classifier) -- To be called from Inventory object directly
 		clientEvent:FireClient(plr,"updatePlayerRemoveClassifier",{classifier})
 	end,
-	
+
 	updatePlayerAddClassifier = function(plr,classifier,item) -- To be called from Inventory object directly
 		clientEvent:FireClient(plr,"updatePlayerAddClassifier",{classifier,item})
 	end,
 	updatePlayerDestroyInventory = function(plr) -- To be called from Inventory object directly, while destroying
 		clientEvent:FireClient(plr,"updatePlayerDestroyInventory")
 	end,
-	
+
 	-- client function controller
 	clientRequest = function(plr,request,info) -- plr parameter trusted. Request parameter was valid. Info not to be trusted, but is a table with valid length for the reason.
 		clientRequestFunctions[request](plr,unpack(info))

@@ -1,10 +1,12 @@
- -- Script description: Handles client requests to craft
+-- Script description: Handles client requests to craft
 
 local e = game:GetService("ReplicatedStorage"):WaitForChild("events"):WaitForChild("craftClient")
 local craftDatabase = require(game:GetService("ReplicatedStorage"):WaitForChild("dictionaries"):WaitForChild("craftDatabase"))
 local itemDatabase = require(game:GetService("ReplicatedStorage"):WaitForChild("dictionaries"):WaitForChild("itemDatabase"))
 local Pod = require(game:GetService("ServerStorage"):WaitForChild("Pod"))
 local Inventory = require(game:GetService("ServerStorage"):WaitForChild("Inventory"))
+
+local classDatabase = require(game:GetService("ReplicatedStorage").dictionaries:WaitForChild("classDatabase"))
 
 local limitByPlayer = {
 	--[[
@@ -63,7 +65,7 @@ local function sendRequest(client,itemName,resourcesHad,levelRequested,playerInv
 		if amountToCraft == nil then 
 			amountToCraft = 1 
 		end
-		if itemDatabase[itemName].stackable == true then -- is a stackable item
+		if classDatabase[itemDatabase[itemName].class].stackable == true then -- is a stackable item
 			-- player has item?
 			local classifier = playerInventory:GetClassifierOfStackableItem(itemName)
 			local itemOf = Inventory.GetObjectFromClassifier(classifier)

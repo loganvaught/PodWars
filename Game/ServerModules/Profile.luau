@@ -24,9 +24,9 @@ function Profile.new(plr,pod) -- officially marks the player as competing. their
 			return newProfile
 		else
 			if pod then 
-            pod:Remove() 
-            return nil 
-         end
+				pod:Remove() 
+				return nil 
+			end
 		end
 	else
 		return nil
@@ -56,7 +56,7 @@ function Profile:Remove(reason) -- function that removes player from competition
 	if index then
 		table.remove(profilesAlive,index)
 	end
-	
+
 	if reason ~= "left" and reason ~= "won" then -- player will spectate
 		print("Spectableing player: "..self.Player)
 	end

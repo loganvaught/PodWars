@@ -6,6 +6,8 @@ local independentDatabase = {
 		droppable = true,
 		consumable = false,
 		equippable = false,
+		wearable = false,
+		holdable = true,
 	},
 }
 

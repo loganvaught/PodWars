@@ -1,5 +1,6 @@
 -- used when processing the useage of tools, for example equipping, unequipping, dropping, firing/reloading if applicable, eating if applicable, etc
 -- Work in progress
+
 local plr = game:GetService("Players").LocalPlayer
 local backpack = plr:WaitForChild("Backpack")
 
@@ -20,9 +21,9 @@ local equippedItem = nil
 
 useageFunctions.Equip = function(item)
 	equippedItem = item
-	
+
 	-- finding it in backpack
-	
+
 	local model = backpack:FindFirstChild(item.Classifier)
 	if model then
 		model.Parent = plr.Character
@@ -34,6 +35,10 @@ useageFunctions.Unequip = function()
 		model.Parent = backpack
 	end
 	equippedItem = nil
+end
+
+useageFunctions.GetEquippedItem = function()
+	return equippedItem
 end
 
 useageFunctions.ToggleEquip = function(item) -- should only be called on items with classes that are equippable

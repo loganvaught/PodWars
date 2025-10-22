@@ -10,6 +10,8 @@ local craftDatabase = {
 			"Stone Sword",
 			"Bow",
 			"Arrow",
+			"Leafy Pants",
+			"Leafy Chestplate",
 		},
 		[1] = { -- Hand
 			"Wooden Pickaxe",
@@ -20,6 +22,8 @@ local craftDatabase = {
 			"Stone Sword",
 			"Bow",
 			"Arrow",
+			"Leafy Pants",
+			"Leafy Chestplate",
 		},
 		[2] = { -- Hand
 			"Wooden Pickaxe",
@@ -30,6 +34,8 @@ local craftDatabase = {
 			"Stone Sword",
 			"Bow",
 			"Arrow",
+			"Leafy Pants",
+			"Leafy Chestplate",
 		},
 		[3] = { -- Hand
 			"Wooden Pickaxe",
@@ -40,6 +46,8 @@ local craftDatabase = {
 			"Stone Sword",
 			"Bow",
 			"Arrow",
+			"Leafy Pants",
+			"Leafy Chestplate",
 		},
 		[4] = { -- Hand
 			"Wooden Pickaxe",
@@ -50,6 +58,8 @@ local craftDatabase = {
 			"Stone Sword",
 			"Bow",
 			"Arrow",
+			"Leafy Pants",
+			"Leafy Chestplate",
 		},
 	},
 	recipes = {
@@ -103,6 +113,12 @@ local craftDatabase = {
 			["Wood"] = 3,
 			["Stone"] = 1,
 		},
+		["Leafy Chestplate"] = {
+			["Fiber"] = 20,
+		},
+		["Leafy Pants"] = {
+			["Fiber"] = 15,
+		}
 		
 	},
 	metadata = {
@@ -197,6 +213,24 @@ local craftDatabase = {
 			}
 		},
 		["Arrow"] = {
+			cooldownByLevel = {
+				[0] = 3,
+				[1] = 3,
+				[2] = 2,
+				[3] = 1,
+				[4] = 1,
+			}
+		},
+		["Leafy Chestplate"] = {
+			cooldownByLevel = {
+				[0] = 5,
+				[1] = 5,
+				[2] = 5,
+				[3] = 5,
+				[4] = 5,
+			}
+		},
+		["Leafy Pants"] = {
 			cooldownByLevel = {
 				[0] = 3,
 				[1] = 3,

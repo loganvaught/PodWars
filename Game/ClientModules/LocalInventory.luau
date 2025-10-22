@@ -4,12 +4,13 @@ LocalInventory.__index = LocalInventory
 local currentInventory = nil
 
 local classifierToItem = {} -- A LARGE important table, linking every [classifier] to the real item
-local resourceCache = {} -- Stores [resourceName] = classifier, so that resources are easily grabbable
+local stackableCache = {} -- Stores [resourceName] = classifier, so that resources are easily grabbable
 
 local cacheUpdater = Instance.new("BindableEvent")
 local visibleFeedback = Instance.new("BindableEvent")
 
 local craftDatabase = require(game:GetService("ReplicatedStorage"):WaitForChild("dictionaries"):WaitForChild("craftDatabase"))
+local classDatabase = require(game:GetService("ReplicatedStorage").dictionaries:WaitForChild("classDatabase"))
 
 function LocalInventory.new()
 	if currentInventory == nil then
@@ -24,6 +25,7 @@ function LocalInventory.new()
 			["Ranged"] = {},
 			["Resource"] = {},
 			["Swing"] = {},
+			["Armor"] = {},
 		}
 		newLocalInventory.Active = true
 		currentInventory = newLocalInventory
@@ -73,7 +75,7 @@ function LocalInventory.UpdateClassifierField(classifier,field,value)
 	if get and get[field] ~= nil then 
 		get[field] = value
 	end
-	if resourceCache[get.Name] ~= nil and field == "Amount" then -- the change was a resource amount
+	if stackableCache[get.Name] ~= nil and field == "Amount" then -- the change was a resource amount
 		cacheUpdater:Fire(get.Name,value)
 		visibleFeedback:Fire("update",classifier,value)
 	end
@@ -84,8 +86,9 @@ function LocalInventory:AddItem(classifier,item) -- function to add item
 	self.Objects[class][classifier] = true
 	classifierToItem[classifier] = item
 	-- resoure cache check
-	if class == "Resource" then
-		resourceCache[item.Name] = classifier
+	
+	if classDatabase[class].stackable == true then
+		stackableCache[item.Name] = classifier
 		cacheUpdater:Fire(item.Name,item.Amount)
 	end
 	visibleFeedback:Fire("add",classifier,item)
@@ -98,8 +101,8 @@ function LocalInventory:RemoveClassifier(classifier) -- Removes an item from inv
 			self.Objects[get.Class][classifier] = nil
 		end
 	end
-	if get.Class == "Resource" then
-		resourceCache[get.Name] = nil -- remove resource from cache
+	if classDatabase[get.Class].stackable == true then
+		stackableCache[get.Name] = nil -- remove resource from cache
 		cacheUpdater:Fire(get.Name,0)
 	end
 	classifierToItem[classifier] = nil
@@ -108,14 +111,14 @@ end
 
 function LocalInventory:Destroy()
 	classifierToItem = {}
-	resourceCache = {}
+	stackableCache = {}
 	self.Active = false
 end
 
 -- CRAFTING FUNCTIONS
 
 function LocalInventory:GetResourceClassifier(resourceName)
-	return resourceCache[resourceName]
+	return stackableCache[resourceName]
 end
 
 function LocalInventory:GetAmountOfClassifier(classifier)
@@ -152,7 +155,7 @@ function LocalInventory:Display() -- debugging thing
 		print(i..": Name = "..tostring(v.Name)..", Amount: "..tostring(v.Amount)..", Class: "..tostring(v.Class))
 	end
 	print("---------------------     RESOURCE CACHE    ---------------------")
-	for i,v in pairs(resourceCache) do
+	for i,v in pairs(stackableCache) do
 		print(i.." = "..v)
 	end
 	print("---")

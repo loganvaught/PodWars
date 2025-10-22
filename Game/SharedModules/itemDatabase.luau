@@ -159,6 +159,21 @@ local itemDatabase = {
 		image = "rbxassetid://85424941579104",
 		class = "Independent",
 	},
+	["Leafy Pants"] = {
+		name = "Leafy Pants",
+		description = "Eat your vegetables",
+		image = "rbxassetid://130123554372123",
+		class = "Armor",
+		bodyLocation = "legs",
+	},
+	-- Independent
+	["Leafy Chestplate"] = {
+		name = "Leafy Chestplate",
+		description = "Eat your vegetables",
+		image = "rbxassetid://85424941579104",
+		class = "Armor",
+		bodyLocation = "torso",
+	},
 }
 
 return itemDatabase
