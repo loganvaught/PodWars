@@ -8,9 +8,9 @@ local safetyFunctions = require(game:GetService("ServerStorage").dictionaries:Wa
 local serverRayFunctions = require(game:GetService("ServerStorage").dictionaries:WaitForChild("serverRayFunctions"))
 local playerCooldownRegistry = {} -- players in cooldown by weapon
 
-function canCooldownThenAdd(plr,weaponName)
-	if playerCooldownRegistry[plr] == nil then 
-		playerCooldownRegistry[plr] = {} 
+function canCooldownThenAdd(plr, weaponName)
+	if playerCooldownRegistry[plr] == nil then
+		playerCooldownRegistry[plr] = {}
 	end
 
 	local thisRegistry = playerCooldownRegistry[plr]
@@ -21,36 +21,46 @@ function canCooldownThenAdd(plr,weaponName)
 		thisRegistry[weaponName] = true
 		task.spawn(function()
 			local cooldown = statsDatabase.Swing[weaponName].cooldown
-			task.wait(cooldown)-- wait the weapon cooldown (subtract a little to account for server-client lag. client started counting down earlier)
+			task.wait(cooldown) -- wait the weapon cooldown (subtract a little to account for server-client lag. client started counting down earlier)
 			thisRegistry[weaponName] = nil
 		end)
 		return true -- player can swing.
 	end
 end
 
-e.OnServerEvent:Connect(function(client,weaponClassifier,ignoreParts,endPosition)
+e.OnServerEvent:Connect(function(client, weaponClassifier, ignoreParts, endPosition, sentPart)
 	print("server receives request.")
 	print(client, weaponClassifier, ignoreParts, endPosition)
-	if safetyFunctions.isNumberSafe(weaponClassifier) and ignoreParts and endPosition and typeof(endPosition) == "Vector3" then
+	if
+		safetyFunctions.isNumberSafe(weaponClassifier)
+		and ignoreParts
+		and endPosition
+		and typeof(endPosition) == "Vector3"
+		and sentPart ~= nil
+		and typeof(sentPart) == "Instance" -- XV WAS HERE 9:47 12/10/2025
+	then
 		local thisItem = Inventory.GetObjectFromClassifier(weaponClassifier)
 		if thisItem and thisItem.Owner == client then -- player has weapon
-			if canCooldownThenAdd(client,thisItem.Name) == true then -- player is not in cooldown for this weapon
+			if canCooldownThenAdd(client, thisItem.Name) == true then -- player is not in cooldown for this weapon
 				-- ensure theres a clear path from humanoid root part to the instance (check center, and the two front sides of the part)
 				print("Validity step")
-				local plrCharacter = client.Character 
+				local plrCharacter = client.Character
 				if plrCharacter then
 					local humanoid = plrCharacter:FindFirstChild("Humanoid")
 					local hrp = plrCharacter:FindFirstChild("HumanoidRootPart")
 					local rightHand = plrCharacter:FindFirstChild("RightHand")
-					if humanoid and hrp and humanoid.Health > 0 and rightHand then-- player can do damage, because they exist and are alive.
+					if humanoid and hrp and humanoid.Health > 0 and rightHand then -- player can do damage, because they exist and are alive.
 						print("Final verification step:")
 						local range = statsDatabase["Swing"][thisItem.Name].range
-						if (endPosition - hrp.Position).Magnitude <= range + 2 then -- max distance expected
+
+						if safetyFunctions.getDistanceToVerticalBeam(hrp,sentPart) <= range + 2 and safetyFunctions.getVerticalDisplacementWithBeamLength(hrp,sentPart) <= 2 --[[endPosition - hrp.Position).Magnitude <= range + 2 PREVIOUS STATEMENT, Does not account for trusting client part]] then -- max distance expected
 							-- Check to make sure theres no obstructing parts from the character to the arm
 
-							local obstructingPart = serverRayFunctions.GetObstructingParts(plrCharacter,ignoreParts)
+							local obstructingPart = serverRayFunctions.GetObstructingParts(plrCharacter, ignoreParts)
 
 							if not obstructingPart then
+
+								--[[ Commented out because of issues due to bad hit detection. trust client more
 								-- ensure theres a clear path from humanoid root part to the instance (check center, and the two front sides of the part)
 								local pointOnes = { -- assuming default huamnoid root part size
 									(hrp.CFrame * CFrame.new(1,1,-0.5)).Position, -- top right, front
@@ -65,12 +75,18 @@ e.OnServerEvent:Connect(function(client,weaponClassifier,ignoreParts,endPosition
 										break
 									end
 								end
+								]]
 							end
 
 							if obstructingPart then
 								-- fire the object's hit event with the hitItem parameter. it will do all the checks
-								print("Sending damage")
+								print("Sending damage (Obstruction hit)")
 								thisItem:DamagePart(obstructingPart)
+							else
+								-- Else statement added with changes to the above commented out section
+								-- No colliding part, trust clients sent part
+								print("Sending damage (Trusting client)")
+								thisItem:DamagePart(sentPart)
 							end
 						end
 					end
@@ -83,9 +99,9 @@ end)
 
 -- XV COME BACK TO LATER: Just finished trying to make so that can pass cansee. I had to disable terrain
 -- dont forget to try to rework the module wiring in the Swing modulescript, so that i dont have to weridly require
--- pod and harvestable. 
+-- pod and harvestable.
 
--- NOTE TO SELF: CURRENTLY when firing canSee rays, fires backwards? 
+-- NOTE TO SELF: CURRENTLY when firing canSee rays, fires backwards?
 -- make it so that if a ray is trying to hit a player, cansee doesnt look for the specific item
 -- but looks for any part that belongs to the player. this will be in the ignoreparts  list somehow
 -- the parent of the hit item? The goal is that cansee doesnt see any other part in the way

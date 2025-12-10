@@ -54,9 +54,9 @@ tool.Activated:Connect(function()
 		task.spawn(playAnim)
 		task.wait(swingWaitBeforeDamage) -- wait before damaging so the swing is at the bottom
 		local hit = rayFunctions.FindFirstResultSwungAt(character.HumanoidRootPart,itemStats.range)
-		print(hit)
+		print("CLIENT HIT:",hit)
 		if hit then
-			e:FireServer(tonumber(localItem.Classifier),hit[2],hit[1].Position)
+			e:FireServer(tonumber(localItem.Classifier),hit[2],hit[1].Position,hit[1].Instance)
 		end
 		-- wait for the cooldown period, plus a 0.1 second buffer, and subtract the amount already waited
 		-- for the swing to reach the bottom

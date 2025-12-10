@@ -72,4 +72,35 @@ safetyFunctions.isTableSafe = function(info: table, parameterTable: table): bool
 	return true -- safe
 end
 
+safetyFunctions.getDistanceToVerticalBeam = function(instanceOne,instanceBeam)
+	-- Assume instanceBeam has a square base
+	local x1 = instanceOne.Position.X
+	local z1 = instanceOne.Position.Z
+	local x2 = instanceBeam.Position.X
+	local z2 = instanceBeam.Position.Z
+	
+	return math.sqrt((x1 - x2)^2 + (z1 - z2)^2) - instanceBeam.Size.X * 0.5
+end
+
+safetyFunctions.getVerticalDisplacementWithBeamLength = function(instanceOne,instanceBeam)
+	-- This function returns a number that shows how far away a part
+	-- (instanceOne, assumed to be a point mass) is vertically from instanceBeam's
+	-- lowest or highest points
+	-- Assume Z axis is the axis the beam is aligned with
+	
+	local y1 = instanceOne.Position.Y
+	local yLow = instanceBeam.Position.Y - instanceBeam.Size.Y * 0.5
+	local yHigh = instanceBeam.Position.Y + instanceBeam.Size.Y * 0.5
+	
+	if y1 <= yHigh then
+		if y1 >= yLow then
+			return 0
+		else
+			return math.abs(y1 - yLow)
+		end
+	else
+		return math.abs(yHigh - y1)
+	end
+end
+
 return safetyFunctions
