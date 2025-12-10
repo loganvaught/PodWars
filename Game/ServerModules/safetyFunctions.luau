@@ -86,7 +86,7 @@ safetyFunctions.getVerticalDisplacementWithBeamLength = function(instanceOne,ins
 	-- This function returns a number that shows how far away a part
 	-- (instanceOne, assumed to be a point mass) is vertically from instanceBeam's
 	-- lowest or highest points
-	-- Assume Z axis is the axis the beam is aligned with
+	-- Assume Y axis is the axis the beam is aligned with
 	
 	local y1 = instanceOne.Position.Y
 	local yLow = instanceBeam.Position.Y - instanceBeam.Size.Y * 0.5
